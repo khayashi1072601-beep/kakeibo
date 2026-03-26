@@ -1,39 +1,1104 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>家計管理 v3</title>
-    <style>
-          *{box-sizing:border-box;margin:0;padding:0}
-          body{font-family:'Hiragino Sans','Meiryo',sans-serif;background:#f0f2f5;color:#333;font-size:14px}
-          header{background:linear-gradient(135deg,#1565C0,#0277BD);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-          header h1{font-size:18px;font-weight:700}
-        </style>
-  </head>
-  <body>
-    <header>
-        <h1>🏠 家計管理 v3</h1>
-    </header>
-  <script>
-    (function() {
-        'use strict';
-        const SELECTORS = {
-              accs: [],
-              cats: []
-        };
-        const data = {
-              transactions: [],
-              categories: [...SELECTORS.cats],
-              accounts: []
-        };
-        console.log('Kakeibo v3 initialized');
-    })();
-  </script>
-  </body>
-</html>html>
-  </script></h1>
-    </header>
-  </body>
-    </style></title>
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>家計管理アプリ v3</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Hiragino Sans','Meiryo',sans-serif;background:#f0f2f5;color:#333;font-size:14px}
+    header{background:linear-gradient(135deg,#1565C0,#0277BD);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+    header h1{font-size:18px;font-weight:700}
+    .header-btns{display:flex;gap:8px}
+    .btn{padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s}
+    .btn-white{background:#fff;color:#1565C0}
+    .btn-outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.7)}
+    .btn-primary{background:#1565C0;color:#fff}
+    .btn-danger{background:#c62828;color:#fff}
+    .btn-sm{padding:4px 10px;font-size:12px}
+
+    /* Period bar */
+    .period-bar{background:#fff;border-bottom:1px solid #ddd;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .period-bar button{background:none;border:1px solid #aaa;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:13px}
+    .period-bar button:hover{background:#eee}
+    .period-label{font-weight:700;font-size:14px;color:#1565C0}
+    .period-sub{font-size:12px;color:#666}
+
+    /* Account strip */
+    .account-strip{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;background:#fff;border-bottom:1px solid #ddd;flex-wrap:wrap}
+    .acc-card{min-width:140px;border-radius:10px;padding:10px 14px;color:#fff;position:relative;cursor:pointer;user-select:none;flex-shrink:0}
+    .acc-card .acc-owner{font-size:10px;opacity:.8;margin-bottom:2px}
+    .acc-card .acc-name{font-size:13px;font-weight:700}
+    .acc-card .acc-bal{font-size:17px;font-weight:700;margin-top:4px}
+    .acc-card .acc-bal span{font-size:11px;font-weight:400}
+    .add-acc-card{min-width:100px;border-radius:10px;padding:10px 14px;background:#e8f0fe;color:#1565C0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;font-weight:700;flex-shrink:0;border:2px dashed #90CAF9}
+
+    /* Summary section */
+    .summary-section{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:600px){.summary-section{grid-template-columns:1fr}}
+    .summary-card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .summary-card h3{font-size:13px;color:#666;margin-bottom:8px;font-weight:600}
+    .summary-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0}
+    .summary-row:last-child{border-bottom:none;font-weight:700;padding-top:8px}
+    .amount-pos{color:#1565C0}
+    .amount-neg{color:#c62828}
+    .amount-neutral{color:#333}
+    .owner-badge{font-size:11px;padding:2px 7px;border-radius:20px;font-weight:600}
+
+    /* Main content */
+    .main{padding:0 16px 16px}
+
+    /* Input form */
+    .input-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
+    .tab-bar{display:flex;gap:4px;margin-bottom:14px;background:#f0f2f5;padding:4px;border-radius:8px}
+    .tab-btn{flex:1;padding:7px;border:none;background:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;color:#666;transition:all .15s}
+    .tab-btn.active{background:#fff;color:#1565C0;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+    .tab-pane{display:none}
+    .tab-pane.active{display:block}
+    .form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+    .form-group{display:flex;flex-direction:column;gap:4px;flex:1;min-width:100px}
+    .form-group label{font-size:12px;color:#666;font-weight:600}
+    .form-group input,.form-group select{border:1px solid #ddd;border-radius:6px;padding:7px 10px;font-size:14px;outline:none;transition:border-color .15s}
+    .form-group input:focus,.form-group select:focus{border-color:#1565C0}
+    .form-group.sm{max-width:110px}
+    .submit-btn{padding:8px 18px;background:#1565C0;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap}
+    .submit-btn:hover{background:#1976D2}
+
+    /* Transaction list */
+    .list-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
+    .list-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+    .list-header h2{font-size:15px;font-weight:700}
+    .filter-btns{display:flex;gap:4px;flex-wrap:wrap}
+    .filter-btn{padding:4px 10px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:12px;font-weight:600;color:#666}
+    .filter-btn.active{background:#1565C0;color:#fff;border-color:#1565C0}
+    .tx-item{display:grid;grid-template-columns:1fr 1fr auto;align-items:center;padding:9px 0;border-bottom:1px solid #f5f5f5;gap:8px}
+    .tx-item:last-child{border-bottom:none}
+    .tx-left{display:flex;align-items:center;gap:10px;min-width:0}
+    .tx-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .tx-icon.income{background:#E8F5E9}
+    .tx-icon.expense{background:#FFEBEE}
+    .tx-icon.transfer{background:#E3F2FD}
+    .tx-info{min-width:0}
+    .tx-info .tx-cat{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tx-info .tx-meta{font-size:11px;color:#888;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tx-right{text-align:center;white-space:nowrap}
+    .tx-amount{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;display:block}
+    .tx-acc{font-size:11px;color:#888;margin-top:2px;display:block}
+    .tx-btns{display:flex;gap:2px;align-items:center;flex-shrink:0}
+    .tx-del{background:none;border:none;color:#ccc;cursor:pointer;font-size:15px;padding:4px;line-height:1}
+    .tx-del:hover{color:#c62828}
+    .empty-msg{text-align:center;color:#aaa;padding:24px;font-size:13px}
+
+    /* Fixed expenses */
+    .fixed-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
+    .fixed-card h2{font-size:15px;font-weight:700;margin-bottom:10px}
+    .fixed-item{display:grid;grid-template-columns:1fr 1fr auto;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5;gap:8px}
+    .fixed-item:last-child{border-bottom:none}
+    .fixed-name{font-size:13px}
+    .fixed-amount{font-size:13px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600;color:#c62828}
+    .sub-badge{font-size:10px;background:#E3F2FD;color:#1565C0;padding:2px 6px;border-radius:10px;margin-left:6px}
+    .fixed-total-row{display:grid;grid-template-columns:1fr 1fr auto;padding:8px 0 2px;border-top:2px solid #eee;margin-top:4px;font-weight:700;font-size:14px;gap:8px}
+
+    /* Modal */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
+    .modal-bg.open{display:flex}
+    .modal{background:#fff;border-radius:16px;padding:24px;width:min(460px,94vw);max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+    .modal h2{font-size:17px;font-weight:700;margin-bottom:16px}
+    .modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+    .modal-list-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0}
+    .modal-list-item:last-child{border-bottom:none}
+    .modal-list-item .item-info{font-size:13px}
+    .modal-list-item .item-btns{display:flex;gap:6px}
+    .color-preview{width:20px;height:20px;border-radius:50%;border:1px solid #ccc;display:inline-block;vertical-align:middle;margin-right:6px}
+    input[type="color"]{width:40px;height:34px;border:1px solid #ddd;border-radius:6px;cursor:pointer;padding:2px}
+
+    /* Chart */
+    .chart-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
+    .chart-card h2{font-size:15px;font-weight:700;margin-bottom:10px}
+    .chart-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    .chart-bar-label{width:70px;font-size:12px;text-align:right;color:#555;flex-shrink:0}
+    .chart-bar-wrap{flex:1;height:20px;background:#f0f0f0;border-radius:10px;overflow:hidden}
+    .chart-bar-fill{height:100%;border-radius:10px;transition:width .4s}
+    .chart-bar-val{width:60px;font-size:12px;text-align:right;color:#333;font-weight:600;flex-shrink:0}
+
+    /* Transfer history */
+    .transfer-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+    .transfer-item:last-child{border-bottom:none}
+    .transfer-arrow{color:#888;font-size:14px}
+    .transfer-acc{font-size:12px;font-weight:600}
+    .transfer-amount{font-size:14px;font-weight:700;color:#0277BD;margin-left:auto}
+    .transfer-meta{font-size:11px;color:#aaa;margin-left:8px}
+
+    /* Scrollable tabs content */
+    .section-title{font-size:13px;font-weight:700;color:#1565C0;padding:8px 16px 4px;text-transform:uppercase;letter-spacing:.5px}
+
+    /* Toast */
+    #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+    #toast.show{opacity:1}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💰 家計管理 v3</h1>
+  <div class="header-btns">
+    <button class="btn btn-outline btn-sm" onclick="openImportModal()">取込</button>
+    <button class="btn btn-outline btn-sm" onclick="openCatModal()">カテゴリ</button>
+    <button class="btn btn-outline btn-sm" onclick="openFixedModal()">固定費</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV()">CSV</button>
+  </div>
+</header>
+
+<!-- Period bar -->
+<div class="period-bar">
+  <button onclick="shiftPeriod(-1)">◀</button>
+  <div>
+    <div class="period-label" id="periodLabel">―</div>
+    <div class="period-sub" id="periodSub">―</div>
+  </div>
+  <button onclick="shiftPeriod(1)">▶</button>
+  <button onclick="gotoToday()" style="margin-left:auto">今日</button>
+</div>
+
+<!-- Account strip -->
+<div class="account-strip" id="accountStrip">
+  <div class="add-acc-card" onclick="openAccModal()" title="口座を追加">＋</div>
+</div>
+
+<!-- Summary -->
+<div class="summary-section" id="summarySection"></div>
+
+<!-- Input form -->
+<div class="main">
+  <div class="input-card">
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('income',this)">収入</button>
+      <button class="tab-btn" onclick="switchTab('expense',this)">支出</button>
+      <button class="tab-btn" onclick="switchTab('transfer',this)">送金</button>
+    </div>
+
+    <!-- Income tab -->
+    <div class="tab-pane active" id="tab-income">
+      <div class="form-row">
+        <div class="form-group sm"><label>日付</label><input type="date" id="inc-date"></div>
+        <div class="form-group"><label>口座</label>
+          <select id="inc-acc"></select>
+        </div>
+        <div class="form-group"><label>カテゴリ</label>
+          <select id="inc-cat"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>金額（円）</label><input type="number" id="inc-amount" placeholder="0" min="0"></div>
+        <div class="form-group"><label>メモ</label><input type="text" id="inc-memo" placeholder="任意"></div>
+        <button class="submit-btn" onclick="addTransaction('income')">追加</button>
+      </div>
+    </div>
+
+    <!-- Expense tab -->
+    <div class="tab-pane" id="tab-expense">
+      <div class="form-row">
+        <div class="form-group sm"><label>日付</label><input type="date" id="exp-date"></div>
+        <div class="form-group"><label>口座</label>
+          <select id="exp-acc"></select>
+        </div>
+        <div class="form-group"><label>カテゴリ</label>
+          <select id="exp-cat"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>金額（円）</label><input type="number" id="exp-amount" placeholder="0" min="0"></div>
+        <div class="form-group"><label>メモ</label><input type="text" id="exp-memo" placeholder="任意"></div>
+        <button class="submit-btn" onclick="addTransaction('expense')">追加</button>
+      </div>
+    </div>
+
+    <!-- Transfer tab -->
+    <div class="tab-pane" id="tab-transfer">
+      <div class="form-row">
+        <div class="form-group sm"><label>日付</label><input type="date" id="tr-date"></div>
+        <div class="form-group"><label>送金元口座</label>
+          <select id="tr-from"></select>
+        </div>
+        <div class="form-group"><label>送金先口座</label>
+          <select id="tr-to"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>金額（円）</label><input type="number" id="tr-amount" placeholder="0" min="0"></div>
+        <div class="form-group"><label>メモ</label><input type="text" id="tr-memo" placeholder="任意"></div>
+        <button class="submit-btn" onclick="addTransaction('transfer')">追加</button>
+      </div>
+    </div>
+  </div><!-- /input-card -->
+
+  <!-- Transaction list -->
+  <div class="list-card">
+    <div class="list-header">
+      <h2>履歴</h2>
+      <div class="filter-btns">
+        <button class="filter-btn active" onclick="setFilter('all',this)">全て</button>
+        <button class="filter-btn" onclick="setFilter('income',this)">収入</button>
+        <button class="filter-btn" onclick="setFilter('expense',this)">支出</button>
+        <button class="filter-btn" onclick="setFilter('transfer',this)">送金</button>
+      </div>
+    </div>
+    <div id="txList"></div>
+  </div>
+
+  <!-- Category chart -->
+  <div class="chart-card">
+    <h2>支出カテゴリ別</h2>
+    <div id="categoryChart"></div>
+  </div>
+
+  <!-- Fixed expenses -->
+  <div class="fixed-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h2>固定費</h2>
+      <button class="btn btn-primary btn-sm" onclick="openFixedModal()">編集</button>
+    </div>
+    <div id="fixedList"></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ===== IMPORT MODAL ===== -->
+<div class="modal-bg" id="importModal">
+  <div class="modal">
+    <h2>📥 データ取込</h2>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>取込先口座</label>
+      <select id="import-acc"></select>
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>取引種別</label>
+      <select id="import-type">
+        <option value="expense">支出</option>
+        <option value="income">収入</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>JSONデータを貼り付け（date/category/amount/memo）</label>
+      <textarea id="import-json" rows="8" style="width:100%;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:12px;font-family:monospace" placeholder='[{"date":"2026-03-01","category":"食費","amount":800,"memo":""}]'></textarea>
+    </div>
+    <div id="import-preview" style="font-size:12px;color:#666;margin-bottom:8px"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="executeImport()">取込実行</button>
+      <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('importModal')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CATEGORY MODAL ===== -->
+<div class="modal-bg" id="catModal">
+  <div class="modal">
+    <h2>カテゴリ管理</h2>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="tab-btn active" id="catTab-income" onclick="switchCatTab('income')" style="flex:1;padding:7px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">収入</button>
+      <button class="tab-btn" id="catTab-expense" onclick="switchCatTab('expense')" style="flex:1;padding:7px;border:1px solid #ddd;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600">支出</button>
+    </div>
+    <div id="catModalList"></div>
+    <hr style="margin:14px 0">
+    <div class="form-row" style="align-items:flex-end">
+      <div class="form-group"><label>カテゴリ名</label><input type="text" id="newCatName" placeholder="例: 旅行費"></div>
+      <button class="submit-btn" onclick="addCategory()">追加</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('catModal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ACCOUNT MODAL ===== -->
+<div class="modal-bg" id="accModal">
+  <div class="modal">
+    <h2>口座管理</h2>
+    <div id="accModalList"></div>
+    <hr style="margin:14px 0">
+    <h3 style="font-size:14px;margin-bottom:10px">口座を追加</h3>
+    <div class="form-row">
+      <div class="form-group"><label>口座名</label><input type="text" id="newAccName" placeholder="例: 給与口座"></div>
+      <div class="form-group sm"><label>名義</label>
+        <select id="newAccOwner">
+          <option value="自分">自分</option>
+          <option value="妻">妻</option>
+          <option value="共有">共有</option>
+          <option value="その他">その他</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group sm"><label>色</label><input type="color" id="newAccColor" value="#1565C0"></div>
+      <div class="form-group"><label>初期残高（円）</label><input type="number" id="newAccBal" placeholder="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="addAccount()">追加</button>
+      <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('accModal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EDIT TRANSACTION MODAL ===== -->
+<div class="modal-bg" id="editTxModal">
+  <div class="modal">
+    <h2>履歴を編集</h2>
+    <input type="hidden" id="editTxId">
+    <input type="hidden" id="editTxType">
+
+    <!-- income / expense fields -->
+    <div id="editFields-incexp">
+      <div class="form-row">
+        <div class="form-group sm"><label>日付</label><input type="date" id="edit-date"></div>
+        <div class="form-group"><label>口座</label><select id="edit-acc"></select></div>
+        <div class="form-group"><label>カテゴリ</label><select id="edit-cat"></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>金額（円）</label><input type="number" id="edit-amount" min="0"></div>
+        <div class="form-group"><label>メモ</label><input type="text" id="edit-memo"></div>
+      </div>
+    </div>
+
+    <!-- transfer fields -->
+    <div id="editFields-transfer" style="display:none">
+      <div class="form-row">
+        <div class="form-group sm"><label>日付</label><input type="date" id="edit-tr-date"></div>
+        <div class="form-group"><label>送金元</label><select id="edit-tr-from"></select></div>
+        <div class="form-group"><label>送金先</label><select id="edit-tr-to"></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>金額（円）</label><input type="number" id="edit-tr-amount" min="0"></div>
+        <div class="form-group"><label>メモ</label><input type="text" id="edit-tr-memo"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveEditTx()">保存</button>
+      <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('editTxModal')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FIXED EXPENSE MODAL ===== -->
+<div class="modal-bg" id="fixedModal">
+  <div class="modal">
+    <h2>固定費管理</h2>
+    <div id="fixedModalList"></div>
+    <hr style="margin:14px 0">
+    <h3 style="font-size:14px;margin-bottom:10px">固定費を追加</h3>
+    <div class="form-row">
+      <div class="form-group"><label>名称</label><input type="text" id="newFixedName" placeholder="例: 家賃"></div>
+      <div class="form-group sm"><label>金額（円）</label><input type="number" id="newFixedAmount" placeholder="0"></div>
+    </div>
+    <div class="form-row" style="align-items:center">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+        <input type="checkbox" id="newFixedSub" style="width:16px;height:16px"> サブスク
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="addFixed()">追加</button>
+      <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('fixedModal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ==================== DATA ====================
+const SK = 'kakeibo_v3';
+const DEFAULT_ACCOUNTS = [
+  {id:'a1',name:'給与口座',     owner:'自分',color:'#1565C0',initBalance:0},
+  {id:'a3',name:'妻・給与口座', owner:'妻',  color:'#880E4F',initBalance:0},
+];
+const DEFAULT_INCOME_CATS = ['給与','賞与','副業','妻・給与','妻・賞与','ソーラー','その他収入'];
+const DEFAULT_EXPENSE_CATS = ['食費','日用品費','交際費','美容','コンビニ','車両・ガソリン','娯楽','医療費','衣類','通信費','光熱費','家賃','その他'];
+const OWNER_COLORS = {自分:'#1565C0',妻:'#880E4F',共有:'#2E7D32',その他:'#555'};
+
+let app = {accounts:[], transactions:[], fixedExpenses:[], incomeCategories:[], expenseCategories:[]};
+let currentPeriod = {year:0, month:0};
+let txFilter = 'all';
+let currentCatTab = 'income';
+
+function loadData(){
+  const s = localStorage.getItem(SK);
+  if(s) app = JSON.parse(s);
+  if(!app.accounts || app.accounts.length===0) app.accounts = DEFAULT_ACCOUNTS.map(a=>({...a}));
+  if(!app.transactions) app.transactions = [];
+  if(!app.fixedExpenses) app.fixedExpenses = [];
+  if(!app.incomeCategories || app.incomeCategories.length===0) app.incomeCategories = [...DEFAULT_INCOME_CATS];
+  if(!app.expenseCategories || app.expenseCategories.length===0) app.expenseCategories = [...DEFAULT_EXPENSE_CATS];
+}
+function saveData(){ localStorage.setItem(SK, JSON.stringify(app)); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function fmt(n){ return Number(n).toLocaleString('ja-JP')+'円'; }
+function ds(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+// ==================== HOLIDAY / PERIOD ====================
+function calcHolidays(year){
+  const h = new Set();
+  const add = (m,d) => h.add(`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+  // Fixed
+  [[1,1],[2,11],[2,23],[4,29],[5,3],[5,4],[5,5],[8,11],[11,3],[11,23]].forEach(([m,d])=>add(m,d));
+  // Spring/Autumn equinox
+  const sp = Math.floor(20.8431+0.242194*(year-1980)-Math.floor((year-1980)/4));
+  const au = Math.floor(23.2488+0.242194*(year-1980)-Math.floor((year-1980)/4));
+  add(3,sp); add(9,au);
+  // Floating: nthWeekday(year,month,weekday0=Mon..6=Sun,nth)
+  function nthMon(m,n){
+    let d=new Date(year,m-1,1); let cnt=0;
+    while(d.getMonth()===m-1){if(d.getDay()===1){cnt++;if(cnt===n)return d.getDate();}d.setDate(d.getDate()+1);}
+    return -1;
+  }
+  add(1,nthMon(1,2)); add(7,nthMon(7,3)); add(9,nthMon(9,3)); add(10,nthMon(10,2));
+  // 振替休日
+  const arr = [...h].sort();
+  arr.forEach(s=>{
+    const d = new Date(s+'T00:00:00');
+    if(d.getDay()===0){
+      let next = new Date(d); next.setDate(next.getDate()+1);
+      while(h.has(ds(next))){ next.setDate(next.getDate()+1); }
+      h.add(ds(next));
+    }
+  });
+  return h;
+}
+const holidayCache = {};
+function isHoliday(dateStr){
+  const y = parseInt(dateStr.slice(0,4));
+  if(!holidayCache[y]) holidayCache[y]=calcHolidays(y);
+  return holidayCache[y].has(dateStr);
+}
+function isWeekendOrHoliday(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  return d.getDay()===0||d.getDay()===6||isHoliday(dateStr);
+}
+function getPeriodStart(year,month){
+  let d = new Date(year,month-1,25);
+  let s = ds(d);
+  while(isWeekendOrHoliday(s)){d.setDate(d.getDate()-1);s=ds(d);}
+  return s;
+}
+function getPeriodEnd(year,month){
+  let ny=year,nm=month+1;
+  if(nm>12){ny++;nm=1;}
+  const ns = new Date(getPeriodStart(ny,nm)+'T00:00:00');
+  ns.setDate(ns.getDate()-1);
+  return ds(ns);
+}
+function dateInPeriod(dateStr,year,month){
+  return dateStr>=getPeriodStart(year,month)&&dateStr<=getPeriodEnd(year,month);
+}
+function todayPeriod(){
+  const t = ds(new Date());
+  // determine which budget month today belongs to
+  // if today >= start of current calendar month's period → use current month
+  // else use previous month
+  const now = new Date();
+  let y=now.getFullYear(),m=now.getMonth()+1;
+  if(t<getPeriodStart(y,m)){m--;if(m<1){m=12;y--;}}
+  return {year:y,month:m};
+}
+
+// ==================== INIT ====================
+function init(){
+  loadData();
+  const p = todayPeriod();
+  currentPeriod = p;
+  setTodayDates();
+  renderAll();
+}
+
+function setTodayDates(){
+  const t = ds(new Date());
+  ['inc-date','exp-date','tr-date'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value = t;
+  });
+}
+
+// ==================== ACCOUNTS ====================
+function accById(id){ return app.accounts.find(a=>a.id===id); }
+function getBalance(accId){
+  const acc = accById(accId);
+  let bal = acc?(acc.initBalance||0):0;
+  for(const t of app.transactions){
+    if(t.type==='income'  &&t.accountId===accId) bal+=t.amount;
+    if(t.type==='expense' &&t.accountId===accId) bal-=t.amount;
+    if(t.type==='transfer'&&t.fromId===accId)    bal-=t.amount;
+    if(t.type==='transfer'&&t.toId===accId)      bal+=t.amount;
+  }
+  return bal;
+}
+function renderAccountStrip(){
+  const strip = document.getElementById('accountStrip');
+  let html = '';
+  app.accounts.forEach(a=>{
+    const bal = getBalance(a.id);
+    const ownerColor = OWNER_COLORS[a.owner]||'#555';
+    html += `<div class="acc-card" style="background:${a.color}" title="${a.name} (${a.owner})">
+      <div class="acc-owner">${a.owner}</div>
+      <div class="acc-name">${a.name}</div>
+      <div class="acc-bal">${bal.toLocaleString('ja-JP')}<span> 円</span></div>
+    </div>`;
+  });
+  html += `<div class="add-acc-card" onclick="openAccModal()" title="口座を追加">＋</div>`;
+  strip.innerHTML = html;
+}
+
+function renderSummary(){
+  const {year,month} = currentPeriod;
+  const start = getPeriodStart(year,month);
+  const end = getPeriodEnd(year,month);
+  const txPeriod = app.transactions.filter(t=>t.date>=start&&t.date<=end);
+
+  // Per-owner aggregation
+  const owners = ['自分','妻','共有','その他'];
+  const ownerData = {};
+  owners.forEach(o=>ownerData[o]={income:0,expense:0});
+
+  txPeriod.forEach(t=>{
+    if(t.type==='income'){
+      const acc=accById(t.accountId); if(acc) ownerData[acc.owner].income+=t.amount;
+    } else if(t.type==='expense'){
+      const acc=accById(t.accountId); if(acc) ownerData[acc.owner].expense+=t.amount;
+    }
+  });
+
+  // 送金履歴（新: expense/income category='送金' + 旧: type='transfer'）
+  const transferExp = txPeriod.filter(t=>t.type==='expense'&&t.category==='送金');
+  const transferOld = txPeriod.filter(t=>t.type==='transfer');
+  const transferTotal = transferExp.reduce((s,t)=>s+t.amount,0) + transferOld.reduce((s,t)=>s+t.amount,0);
+
+  const totalInc = txPeriod.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const varExp = txPeriod.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const fixedTotal = app.fixedExpenses.reduce((s,f)=>s+f.amount,0);
+  const totalExp = varExp + fixedTotal;
+  const balance = totalInc - totalExp;
+
+  let html = '';
+
+  // Self + Wife summary（変動支出のみ。固定費はどちらにも帰属しないため合計欄に表示）
+  ['自分','妻'].forEach(owner=>{
+    const d = ownerData[owner];
+    const net = d.income - d.expense;
+    const color = OWNER_COLORS[owner];
+    html += `<div class="summary-card">
+      <h3 style="color:${color}">● ${owner}</h3>
+      <div class="summary-row"><span>収入</span><span class="amount-pos">+${d.income.toLocaleString('ja-JP')}円</span></div>
+      <div class="summary-row"><span>変動支出</span><span class="amount-neg">-${d.expense.toLocaleString('ja-JP')}円</span></div>
+      <div class="summary-row"><span>収支</span><span class="${net>=0?'amount-pos':'amount-neg'}">${net>=0?'+':'-'}${Math.abs(net).toLocaleString('ja-JP')}円</span></div>
+    </div>`;
+  });
+
+  // Combined + transfer
+  html += `<div class="summary-card">
+    <h3>📊 期間合計</h3>
+    <div class="summary-row"><span>収入合計</span><span class="amount-pos">+${totalInc.toLocaleString('ja-JP')}円</span></div>
+    <div class="summary-row"><span>変動支出</span><span class="amount-neg">-${varExp.toLocaleString('ja-JP')}円</span></div>
+    <div class="summary-row"><span>固定費</span><span class="amount-neg">-${fixedTotal.toLocaleString('ja-JP')}円</span></div>
+    <div class="summary-row"><span>支出合計</span><span class="amount-neg">-${totalExp.toLocaleString('ja-JP')}円</span></div>
+    <div class="summary-row"><span>収支</span><span class="${balance>=0?'amount-pos':'amount-neg'}">${balance>=0?'+':'-'}${Math.abs(balance).toLocaleString('ja-JP')}円</span></div>
+  </div>`;
+
+  html += `<div class="summary-card">
+    <h3>💸 送金履歴（期間内）</h3>`;
+  if(transferExp.length===0 && transferOld.length===0){
+    html += `<div style="color:#aaa;font-size:13px;padding:8px 0">送金なし</div>`;
+  } else {
+    // 新形式: expense category='送金'
+    transferExp.slice().reverse().forEach(t=>{
+      const fr = accById(t.accountId)||{name:'?'};
+      html += `<div class="transfer-item">
+        <span class="transfer-acc">${fr.name}</span>
+        <span class="transfer-arrow">→</span>
+        <span class="transfer-acc">送金先</span>
+        <span class="transfer-amount">${t.amount.toLocaleString('ja-JP')}円</span>
+        <span class="transfer-meta">${t.date}${t.memo?' '+t.memo:''}</span>
+      </div>`;
+    });
+    // 旧形式: type='transfer'
+    transferOld.slice().reverse().forEach(t=>{
+      const fr = accById(t.fromId)||{name:'?'};
+      const to = accById(t.toId)||{name:'?'};
+      html += `<div class="transfer-item">
+        <span class="transfer-acc">${fr.name}</span>
+        <span class="transfer-arrow">→</span>
+        <span class="transfer-acc">${to.name}</span>
+        <span class="transfer-amount">${t.amount.toLocaleString('ja-JP')}円</span>
+        <span class="transfer-meta">${t.date}${t.memo?' '+t.memo:''}</span>
+      </div>`;
+    });
+    html += `<div style="display:flex;justify-content:space-between;padding-top:8px;font-weight:700;font-size:13px">
+      <span>合計</span><span>${transferTotal.toLocaleString('ja-JP')}円</span>
+    </div>`;
+  }
+  html += `</div>`;
+
+  document.getElementById('summarySection').innerHTML = html;
+}
+
+// ==================== PERIOD ====================
+function renderPeriodBar(){
+  const {year,month} = currentPeriod;
+  const start = getPeriodStart(year,month);
+  const end = getPeriodEnd(year,month);
+  document.getElementById('periodLabel').textContent = `${year}�t${month}月度`;
+  document.getElementById('periodSub').textContent = `${start} 〜 ${end}`;
+}
+function shiftPeriod(d){
+  let {year,month} = currentPeriod;
+  month+=d;
+  if(month>12){month=1;year++;}
+  if(month<1){month=12;year--;}
+  currentPeriod={year,month};
+  renderAll();
+}
+function gotoToday(){
+  currentPeriod = todayPeriod();
+  renderAll();
+}
+
+// ==================== TRANSACTIONS ====================
+function addTransaction(type){
+  if(type==='income'){
+    const date=document.getElementById('inc-date').value;
+    const accId=document.getElementById('inc-acc').value;
+    const cat=document.getElementById('inc-cat').value;
+    const amount=parseInt(document.getElementById('inc-amount').value)||0;
+    const memo=document.getElementById('inc-memo').value.trim();
+    if(!date||!accId||amount<=0){showToast('日付・口座・金額を入力してください');return;}
+    app.transactions.push({id:uid(),date,type:'income',accountId:accId,category:cat,amount,memo});
+    document.getElementById('inc-amount').value='';
+    document.getElementById('inc-memo').value='';
+  } else if(type==='expense'){
+    const date=document.getElementById('exp-date').value;
+    const accId=document.getElementById('exp-acc').value;
+    const cat=document.getElementById('exp-cat').value;
+    const amount=parseInt(document.getElementById('exp-amount').value)||0;
+    const memo=document.getElementById('exp-memo').value.trim();
+    if(!date||!accId||amount<=0){showToast('日付・口座・金額を入力してください');return;}
+    app.transactions.push({id:uid(),date,type:'expense',accountId:accId,category:cat,amount,memo});
+    document.getElementById('exp-amount').value='';
+    document.getElementById('exp-memo').value='';
+  } else if(type==='transfer'){
+    const date=document.getElementById('tr-date').value;
+    const fromId=document.getElementById('tr-from').value;
+    const toId=document.getElementById('tr-to').value;
+    const amount=parseInt(document.getElementById('tr-amount').value)||0;
+    const memo=document.getElementById('tr-memo').value.trim();
+    if(!date||!fromId||!toId||amount<=0){showToast('日付・送金元・送金先・金額を入力してください');return;}
+    if(fromId===toId){showToast('送金元と送金先が同じです');return;}
+    // 送金元 → 支出（カテゴリ:送金）、送金先 → 収入（カテゴリ:送金）
+    const grpId = uid();
+    app.transactions.push({id:uid(),date,type:'expense',accountId:fromId,category:'送金',amount,memo,transferGroup:grpId});
+    app.transactions.push({id:uid(),date,type:'income', accountId:toId,  category:'送金',amount,memo,transferGroup:grpId});
+    document.getElementById('tr-amount').value='';
+    document.getElementById('tr-memo').value='';
+  }
+  saveData();
+  renderAll();
+  showToast('追加しました');
+}
+function deleteTransaction(id){
+  app.transactions = app.transactions.filter(t=>t.id!==id);
+  saveData();
+  renderAll();
+}
+
+function openEditTx(id){
+  const t = app.transactions.find(t=>t.id===id);
+  if(!t) return;
+  document.getElementById('editTxId').value = id;
+  document.getElementById('editTxType').value = t.type;
+  const accOpts = app.accounts.map(a=>`<option value="${a.id}">${a.owner} / ${a.name}</option>`).join('');
+
+  if(t.type==='transfer'){
+    document.getElementById('editFields-incexp').style.display='none';
+    document.getElementById('editFields-transfer').style.display='block';
+    document.getElementById('edit-tr-from').innerHTML = accOpts;
+    document.getElementById('edit-tr-to').innerHTML = accOpts;
+    document.getElementById('edit-tr-date').value = t.date;
+    document.getElementById('edit-tr-from').value = t.fromId;
+    document.getElementById('edit-tr-to').value = t.toId;
+    document.getElementById('edit-tr-amount').value = t.amount;
+    document.getElementById('edit-tr-memo').value = t.memo||'';
+  } else {
+    document.getElementById('editFields-incexp').style.display='block';
+    document.getElementById('editFields-transfer').style.display='none';
+    const cats = t.type==='income' ? app.incomeCategories : app.expenseCategories;
+    document.getElementById('edit-acc').innerHTML = accOpts;
+    document.getElementById('edit-cat').innerHTML = cats.map(c=>`<option>${c}</option>`).join('');
+    document.getElementById('edit-date').value = t.date;
+    document.getElementById('edit-acc').value = t.accountId;
+    document.getElementById('edit-cat').value = t.category;
+    document.getElementById('edit-amount').value = t.amount;
+    document.getElementById('edit-memo').value = t.memo||'';
+  }
+  document.getElementById('editTxModal').classList.add('open');
+}
+
+function saveEditTx(){
+  const id = document.getElementById('editTxId').value;
+  const type = document.getElementById('editTxType').value;
+  const idx = app.transactions.findIndex(t=>t.id===id);
+  if(idx===-1) return;
+  if(type==='transfer'){
+    const fromId = document.getElementById('edit-tr-from').value;
+    const toId = document.getElementById('edit-tr-to').value;
+    const amount = parseInt(document.getElementById('edit-tr-amount').value)||0;
+    if(fromId===toId){showToast('送金元と送金先が同じです');return;}
+    if(amount<=0){showToast('金額を入力してください');return;}
+    app.transactions[idx] = {...app.transactions[idx],
+      date: document.getElementById('edit-tr-date').value,
+      fromId, toId, amount,
+      memo: document.getElementById('edit-tr-memo').value.trim()
+    };
+  } else {
+    const amount = parseInt(document.getElementById('edit-amount').value)||0;
+    if(amount<=0){showToast('金額を入力してください');return;}
+    app.transactions[idx] = {...app.transactions[idx],
+      date: document.getElementById('edit-date').value,
+      accountId: document.getElementById('edit-acc').value,
+      category: document.getElementById('edit-cat').value,
+      amount,
+      memo: document.getElementById('edit-memo').value.trim()
+    };
+  }
+  saveData();
+  closeModal('editTxModal');
+  renderAll();
+  showToast('更新しました');
+}
+
+function setFilter(f,btn){
+  txFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTxList();
+}
+
+function renderTxList(){
+  const {year,month} = currentPeriod;
+  const start = getPeriodStart(year,month);
+  const end = getPeriodEnd(year,month);
+  let txs = app.transactions.filter(t=>t.date>=start&&t.date<=end);
+  if(txFilter==='transfer') txs=txs.filter(t=>t.type==='transfer'||t.category==='送金');
+  else if(txFilter!=='all') txs=txs.filter(t=>t.type===txFilter&&t.category!=='送金');
+  txs = txs.slice().sort((a,b)=>b.date.localeCompare(a.date));
+
+  const el = document.getElementById('txList');
+  if(txs.length===0){el.innerHTML='<div class="empty-msg">この期間の履歴はありません</div>';return;}
+
+  el.innerHTML = txs.map(t=>{
+    let icon='💸',iconCls='expense',amtCls='amount-neg',amtPfx='-',info='',accStr='';
+    if(t.type==='income'){icon='💰';iconCls='income';amtCls='amount-pos';amtPfx='+';}
+    if(t.type==='transfer'){icon='↔️';iconCls='transfer';amtCls='amount-neutral';amtPfx='';}
+    if(t.type==='income'||t.type==='expense'){
+      const acc=accById(t.accountId);
+      accStr=acc?`${acc.owner} / ${acc.name}`:'';
+      info=`${t.date} ${t.memo||''}`;
+    } else {
+      const fr=accById(t.fromId)||{name:'?'};
+      const to=accById(t.toId)||{name:'?'};
+      accStr=`${fr.name} → ${to.name}`;
+      info=`${t.date} ${t.memo||''}`;
+    }
+    return `<div class="tx-item">
+      <div class="tx-left">
+        <div class="tx-icon ${iconCls}">${icon}</div>
+        <div class="tx-info">
+          <div class="tx-cat">${t.category||'送金'}</div>
+          <div class="tx-meta">${info}</div>
+        </div>
+      </div>
+      <div class="tx-right">
+        <span class="tx-amount ${amtCls}">${amtPfx}${t.amount.toLocaleString('ja-JP')}円</span>
+        <span class="tx-acc">${accStr}</span>
+      </div>
+      <div class="tx-btns">
+        <button class="tx-del" onclick="openEditTx('${t.id}')" title="編集" style="color:#90CAF9">✎</button>
+        <button class="tx-del" onclick="deleteTransaction('${t.id}')" title="削除">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ==================== CATEGORY CHART ====================
+function renderChart(){
+  const {year,month} = currentPeriod;
+  const start = getPeriodStart(year,month);
+  const end = getPeriodEnd(year,month);
+  const expenses = app.transactions.filter(t=>t.type==='expense'&&t.date>=start&&t.date<=end);
+  const catMap = {};
+  expenses.forEach(t=>{
+    catMap[t.category]=(catMap[t.category]||0)+t.amount;
+  });
+  const sorted = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const max = sorted.length>0?sorted[0][1]:1;
+  const el = document.getElementById('categoryChart');
+  if(sorted.length===0){el.innerHTML='<div style="color:#aaa;font-size:13px;padding:8px 0">支出なし</div>';return;}
+  const colors = ['#1565C0','#0277BD','#00838F','#2E7D32','#558B2F','#F57F17','#E65100','#BF360C','#880E4F','#6A1B9A','#283593','#4E342E'];
+  el.innerHTML = sorted.map(([cat,amt],i)=>`
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${cat}</div>
+      <div class="chart-bar-wrap"><div class="chart-bar-fill" style="width:${Math.round(amt/max*100)}%;background:${colors[i%colors.length]}"></div></div>
+      <div class="chart-bar-val">${amt.toLocaleString('ja-JP')}円</div>
+    </div>`).join('');
+}
+
+// ==================== FIXED EXPENSES ====================
+function renderFixed(){
+  const el = document.getElementById('fixedList');
+  if(app.fixedExpenses.length===0){el.innerHTML='<div style="color:#aaa;font-size:13px">固定費なし</div>';return;}
+  const total = app.fixedExpenses.reduce((s,f)=>s+f.amount,0);
+  const subTotal = app.fixedExpenses.filter(f=>f.isSub).reduce((s,f)=>s+f.amount,0);
+  el.innerHTML = app.fixedExpenses.map(f=>`
+    <div class="fixed-item">
+      <div class="fixed-name">${f.name}${f.isSub?'<span class="sub-badge">サブスク</span>':''}</div>
+      <div class="fixed-amount">${f.amount.toLocaleString('ja-JP')}円</div>
+      <div></div>
+    </div>`).join('')
+    + `<div class="fixed-total-row"><span>合計</span><span style="text-align:center">${total.toLocaleString('ja-JP')}円</span><span></span></div>`
+    + (subTotal>0?`<div style="display:grid;grid-template-columns:1fr 1fr auto;font-size:12px;color:#1565C0;padding:2px 0;gap:8px"><span>うちサブスク</span><span style="text-align:center">${subTotal.toLocaleString('ja-JP')}円</span><span></span></div>`:'');
+}
+
+function openFixedModal(){
+  renderFixedModalList();
+  document.getElementById('fixedModal').classList.add('open');
+}
+function renderFixedModalList(){
+  const el = document.getElementById('fixedModalList');
+  if(app.fixedExpenses.length===0){el.innerHTML='<div style="color:#aaa;font-size:13px;margin-bottom:8px">登録なし</div>';return;}
+  el.innerHTML = app.fixedExpenses.map(f=>`
+    <div class="modal-list-item">
+      <div class="item-info">${f.name}${f.isSub?' [サブスク]':''} — ${f.amount.toLocaleString('ja-JP')}円</div>
+      <div class="item-btns"><button class="btn btn-danger btn-sm" onclick="deleteFixed('${f.id}')">削除</button></div>
+    </div>`).join('');
+}
+function addFixed(){
+  const name=document.getElementById('newFixedName').value.trim();
+  const amount=parseInt(document.getElementById('newFixedAmount').value)||0;
+  const isSub=document.getElementById('newFixedSub').checked;
+  if(!name||amount<=0){showToast('名称と金額を入力してください');return;}
+  app.fixedExpenses.push({id:uid(),name,amount,isSub});
+  document.getElementById('newFixedName').value='';
+  document.getElementById('newFixedAmount').value='';
+  document.getElementById('newFixedSub').checked=false;
+  saveData();
+  renderFixed();
+  renderFixedModalList();
+}
+function deleteFixed(id){
+  app.fixedExpenses=app.fixedExpenses.filter(f=>f.id!==id);
+  saveData();
+  renderFixed();
+  renderFixedModalList();
+}
+
+// ==================== ACCOUNT MODAL ====================
+function openAccModal(){
+  renderAccModalList();
+  document.getElementById('accModal').classList.add('open');
+}
+function renderAccModalList(){
+  const el = document.getElementById('accModalList');
+  if(app.accounts.length===0){el.innerHTML='<div style="color:#aaa;font-size:13px;margin-bottom:8px">口座なし</div>';return;}
+  el.innerHTML = app.accounts.map(a=>`
+    <div class="modal-list-item">
+      <div class="item-info">
+        <span class="color-preview" style="background:${a.color}"></span>
+        ${a.name} (${a.owner}) — 残高: ${getBalance(a.id).toLocaleString('ja-JP')}円
+      </div>
+      <div class="item-btns"><button class="btn btn-danger btn-sm" onclick="deleteAccount('${a.id}')">削除</button></div>
+    </div>`).join('');
+}
+function addAccount(){
+  const name=document.getElementById('newAccName').value.trim();
+  const owner=document.getElementById('newAccOwner').value;
+  const color=document.getElementById('newAccColor').value;
+  const initBalance=parseInt(document.getElementById('newAccBal').value)||0;
+  if(!name){showToast('口座名を入力してください');return;}
+  const id='a'+uid();
+  app.accounts.push({id,name,owner,color,initBalance});
+  document.getElementById('newAccName').value='';
+  document.getElementById('newAccBal').value='';
+  saveData();
+  populateAccountSelects();
+  renderAccountStrip();
+  renderAccModalList();
+  showToast('口座を追加しました');
+}
+function deleteAccount(id){
+  const used = app.transactions.some(t=>t.accountId===id||t.fromId===id||t.toId===id);
+  if(used){showToast('この口座は取引で使用されているため削除できません');return;}
+  app.accounts=app.accounts.filter(a=>a.id!==id);
+  saveData();
+  populateAccountSelects();
+  renderAccountStrip();
+  renderAccModalList();
+  renderSummary();
+}
+
+function populateAccountSelects(){
+  const opts = app.accounts.map(a=>`<option value="${a.id}">${a.owner} / ${a.name}</option>`).join('');
+  ['inc-acc','exp-acc','tr-from','tr-to'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.innerHTML=opts;}
+  });
+}
+function populateCategorySelects(){
+  const incEl=document.getElementById('inc-cat');
+  const expEl=document.getElementById('exp-cat');
+  if(incEl) incEl.innerHTML=app.incomeCategories.map(c=>`<option>${c}</option>`).join('');
+  if(expEl) expEl.innerHTML=app.expenseCategories.map(c=>`<option>${c}</option>`).join('');
+}
+
+// ==================== CATEGORY MODAL ====================
+function openCatModal(){
+  currentCatTab='income';
+  renderCatModalList();
+  document.getElementById('catModal').classList.add('open');
+}
+function switchCatTab(tab){
+  currentCatTab=tab;
+  document.getElementById('catTab-income').style.background = tab==='income'?'#1565C0':'';
+  document.getElementById('catTab-income').style.color = tab==='income'?'#fff':'';
+  document.getElementById('catTab-expense').style.background = tab==='expense'?'#1565C0':'';
+  document.getElementById('catTab-expense').style.color = tab==='expense'?'#fff':'';
+  document.getElementById('newCatName').value='';
+  renderCatModalList();
+}
+function renderCatModalList(){
+  const cats = currentCatTab==='income' ? app.incomeCategories : app.expenseCategories;
+  const el = document.getElementById('catModalList');
+  if(cats.length===0){el.innerHTML='<div style="color:#aaa;font-size:13px;margin-bottom:8px">カテゴリなし</div>';return;}
+  el.innerHTML = cats.map((c,i)=>`
+    <div class="modal-list-item">
+      <div class="item-info">${c}</div>
+      <div class="item-btns"><button class="btn btn-danger btn-sm" onclick="deleteCategory(${i})">削除</button></div>
+    </div>`).join('');
+}
+function addCategory(){
+  const name=document.getElementById('newCatName').value.trim();
+  if(!name){showToast('カテゴリ名を入力してください');return;}
+  const cats = currentCatTab==='income' ? app.incomeCategories : app.expenseCategories;
+  if(cats.includes(name)){showToast('すでに存在します');return;}
+  cats.push(name);
+  saveData();
+  populateCategorySelects();
+  renderCatModalList();
+  document.getElementById('newCatName').value='';
+  showToast('追加しました');
+}
+function deleteCategory(idx){
+  const cats = currentCatTab==='income' ? app.incomeCategories : app.expenseCategories;
+  cats.splice(idx,1);
+  saveData();
+  populateCategorySelects();
+  renderCatModalList();
+}
+
+// ==================== MODAL helpers ====================
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+// ==================== IMPORT ====================
+function openImportModal(){
+  const opts = app.accounts.map(a=>`<option value="${a.id}">${a.owner} / ${a.name}</option>`).join('');
+  document.getElementById('import-acc').innerHTML = opts;
+  document.getElementById('import-json').value = '';
+  document.getElementById('import-preview').textContent = '';
+  document.getElementById('importModal').classList.add('open');
+}
+function executeImport(){
+  const accId = document.getElementById('import-acc').value;
+  const type = document.getElementById('import-type').value;
+  let parsed;
+  try {
+    parsed = JSON.parse(document.getElementById('import-json').value);
+  } catch(e) { showToast('JSONの形式が正しくありません'); return; }
+  if (!Array.isArray(parsed) || parsed.length===0) { showToast('データがありません'); return; }
+  let count = 0;
+  parsed.forEach(t => {
+    if (!t.date || !t.amount) return;
+    app.transactions.push({
+      id: uid(), date: t.date, type,
+      accountId: accId,
+      category: t.category || (type==='expense'?'その他':'その他収入'),
+      amount: parseInt(t.amount) || 0,
+      memo: t.memo || ''
+    });
+    count++;
+  });
+  saveData();
+  closeModal('importModal');
+  renderAll();
+  showToast(`${count}件取込完了`);
+}
+
+document.addEventListener('click',e=>{
+  ['accModal','fixedModal','catModal','editTxModal','importModal'].forEach(id=>{
+    const m=document.getElementById(id);
+    if(m&&e.target===m) m.classList.remove('open');
+  });
+});
+
+// ==================== TABS ====================
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ==================== CSV EXPORT ====================
+function exportCSV(){
+  const {year,month} = currentPeriod;
+  const start = getPeriodStart(year,month);
+  const end = getPeriodEnd(year,month);
+  const txs = app.transactions.filter(t=>t.date>=start&&t.date<=end)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  const rows = [['日付','種別','口座/送金元','口座/送金先','カテゴリ','金額','メモ']];
+  txs.forEach(t=>{
+    if(t.type==='transfer'){
+      const fr=accById(t.fromId)||{name:''};
+      const to=accById(t.toId)||{name:''};
+      rows.push([t.date,'送金',fr.name,to.name,'',t.amount,t.memo||'']);
+    } else {
+      const acc=accById(t.accountId)||{name:''};
+      rows.push([t.date,t.type==='income'?'収入':'支出',acc.name,'',t.category||'',t.amount,t.memo||'']);
+    }
+  });
+  const csv = rows.map(r=>r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url;
+  a.download=`家計管理_${year}年${month}月度.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ==================== TOAST ====================
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+// ==================== RENDER ALL ====================
+function renderAll(){
+  renderPeriodBar();
+  renderAccountStrip();
+  renderSummary();
+  renderTxList();
+  renderChart();
+  renderFixed();
+  populateAccountSelects();
+  populateCategorySelects();
+}
+
+init();
+</script>
+</body>
+</html>

@@ -181,6 +181,15 @@
     .chat-input-row input:focus{border-color:#FFA000}
     .chat-send-btn{background:#FFA000;color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer}
     .smoking-section-hidden{display:none}
+    @media(max-width:480px){
+      .smoking-stats{grid-template-columns:1fr 1fr}
+      .smoking-stat .stat-num{font-size:22px}
+      .smoking-actions{grid-template-columns:1fr}
+      .smoke-btn{padding:16px;font-size:15px}
+      .smoke-btn-chat{padding:16px;font-size:16px}
+      .chat-messages{max-height:280px}
+      .chat-modal{max-height:92vh}
+    }
   </style>
 </head>
 <body>

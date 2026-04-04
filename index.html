@@ -135,6 +135,61 @@
     /* Toast */
     #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
     #toast.show{opacity:1}
+
+    /* ===== 禁煙チャレンジ ===== */
+    .smoking-section{padding:0 16px 16px}
+    .smoking-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:12px}
+    .smoking-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .smoking-header h2{font-size:16px;font-weight:700;color:#2E7D32}
+    .smoking-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+    .smoking-stat{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border-radius:10px;padding:14px;text-align:center}
+    .smoking-stat.savings-stat{background:linear-gradient(135deg,#E3F2FD,#BBDEFB)}
+    .smoking-stat .stat-num{font-size:28px;font-weight:700;color:#1B5E20;line-height:1.1}
+    .smoking-stat.savings-stat .stat-num{color:#0D47A1}
+    .smoking-stat .stat-label{font-size:11px;color:#555;margin-top:4px;font-weight:600}
+    .smoking-stat .stat-savings-neg{color:#c62828}
+    .milestone-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+    .milestone-badge{font-size:20px;opacity:.25;filter:grayscale(1);transition:all .3s;cursor:default;position:relative}
+    .milestone-badge.achieved{opacity:1;filter:none}
+    .milestone-badge[title]:hover::after{content:attr(title);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:3px 7px;border-radius:4px;font-size:11px;white-space:nowrap;z-index:10;pointer-events:none}
+    .progress-wrap{margin-bottom:14px}
+    .progress-label{font-size:11px;color:#666;margin-bottom:4px}
+    .progress-bar-bg{height:10px;background:#e0e0e0;border-radius:10px;overflow:hidden}
+    .progress-bar-fill{height:100%;background:linear-gradient(90deg,#4CAF50,#81C784);border-radius:10px;transition:width .6s ease}
+    .smoking-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+    .smoke-btn{padding:14px 10px;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;transition:all .15s;line-height:1.3}
+    .smoke-btn-free{background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff}
+    .smoke-btn-free:hover{background:linear-gradient(135deg,#1B5E20,#2E7D32)}
+    .smoke-btn-bought{background:linear-gradient(135deg,#B71C1C,#E53935);color:#fff}
+    .smoke-btn-bought:hover{background:linear-gradient(135deg,#7F0000,#B71C1C)}
+    .smoke-btn-chat{width:100%;padding:14px;border:none;border-radius:10px;cursor:pointer;font-size:15px;font-weight:700;background:linear-gradient(135deg,#F57F17,#FFA000);color:#fff;transition:all .15s}
+    .smoke-btn-chat:hover{background:linear-gradient(135deg,#E65100,#F57F17)}
+    .smoking-done-badge{text-align:center;padding:10px;background:#E8F5E9;border-radius:8px;font-size:13px;font-weight:600;color:#2E7D32;margin-bottom:10px}
+    .smoking-done-badge.bought{background:#FFEBEE;color:#c62828}
+    .cost-history-section{border-top:1px solid #f0f0f0;padding-top:10px;margin-top:4px}
+    .cost-history-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#666;padding:3px 0}
+    /* Chat modal */
+    .chat-modal{width:min(480px,96vw);max-height:85vh;display:flex;flex-direction:column;padding:0}
+    .chat-modal-header{padding:16px 20px 12px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+    .chat-modal-header h2{font-size:16px;font-weight:700;color:#E65100}
+    .chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:200px;max-height:350px}
+    .chat-msg{max-width:80%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5}
+    .chat-msg.user{background:#1565C0;color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+    .chat-msg.bot{background:#F5F5F5;color:#333;align-self:flex-start;border-bottom-left-radius:4px}
+    .chat-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #eee}
+    .chat-input-row input{flex:1;border:1px solid #ddd;border-radius:20px;padding:8px 14px;font-size:13px;outline:none}
+    .chat-input-row input:focus{border-color:#FFA000}
+    .chat-send-btn{background:#FFA000;color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer}
+    .smoking-section-hidden{display:none}
+    @media(max-width:480px){
+      .smoking-stats{grid-template-columns:1fr 1fr}
+      .smoking-stat .stat-num{font-size:22px}
+      .smoking-actions{grid-template-columns:1fr}
+      .smoke-btn{padding:16px;font-size:15px}
+      .smoke-btn-chat{padding:16px;font-size:16px}
+      .chat-messages{max-height:280px}
+      .chat-modal{max-height:92vh}
+    }
   </style>
 </head>
 <body>
@@ -146,6 +201,7 @@
     <button class="btn btn-outline btn-sm" onclick="openCatModal()">カテゴリ</button>
     <button class="btn btn-outline btn-sm" onclick="openFixedModal()">固定費</button>
     <button class="btn btn-outline btn-sm" onclick="exportCSV()">CSV</button>
+    <button class="btn btn-outline btn-sm" id="smokingNavBtn" onclick="toggleSmokingSection()">🚭禁煙</button>
   </div>
 </header>
 
@@ -262,6 +318,53 @@
   </div>
 
 </div><!-- /main -->
+
+<!-- ===== 禁煙チャレンジ セクション ===== -->
+<div class="smoking-section smoking-section-hidden" id="smokingSection">
+  <div class="smoking-card">
+    <div class="smoking-header">
+      <h2>🚭 禁煙チャレンジ</h2>
+      <button class="btn btn-sm" style="color:#888;border:1px solid #ddd;background:#fff" onclick="openSmokingSetupModal()">⚙ 設定</button>
+    </div>
+    <!-- Stats -->
+    <div class="smoking-stats">
+      <div class="smoking-stat">
+        <div class="stat-num" id="smokingDaysNum">—</div>
+        <div class="stat-label">禁煙日数</div>
+      </div>
+      <div class="smoking-stat savings-stat">
+        <div class="stat-num" id="smokingSavingsNum">—</div>
+        <div class="stat-label">節約額</div>
+      </div>
+    </div>
+    <!-- Streak -->
+    <div style="text-align:center;font-size:12px;color:#555;margin-bottom:10px" id="smokingStreakLabel"></div>
+    <!-- Milestones -->
+    <div class="milestone-row" id="milestonesRow"></div>
+    <!-- Progress bar -->
+    <div class="progress-wrap" id="smokingProgressWrap">
+      <div class="progress-label" id="smokingProgressLabel"></div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="smokingProgressFill" style="width:0%"></div></div>
+    </div>
+    <!-- Today status -->
+    <div id="smokingTodayStatus"></div>
+    <!-- Action buttons -->
+    <div class="smoking-actions" id="smokingActionBtns">
+      <button class="smoke-btn smoke-btn-free" onclick="checkInSmokeFree()">✅ 今日も禁煙できた！</button>
+      <button class="smoke-btn smoke-btn-bought" onclick="openBoughtModal()">🚬 タバコを買ってしまった</button>
+    </div>
+    <!-- Consult button -->
+    <button class="smoke-btn-chat" onclick="openChatModal()">💬 吸いたい...相談する</button>
+    <!-- Cost history -->
+    <div class="cost-history-section">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:12px;font-weight:600;color:#666">タバコ代履歴</span>
+        <button class="btn btn-sm" style="font-size:11px;border:1px solid #ddd;background:#fff;color:#555" onclick="openCostChangeModal()">変更</button>
+      </div>
+      <div id="costHistoryList"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ===== IMPORT MODAL ===== -->
 <div class="modal-bg" id="importModal">
@@ -398,6 +501,76 @@
     <div class="modal-footer">
       <button class="btn btn-primary" onclick="addFixed()">追加</button>
       <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('fixedModal')">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 禁煙 セットアップ モーダル ===== -->
+<div class="modal-bg" id="smokingSetupModal">
+  <div class="modal">
+    <h2>🚭 禁煙チャレンジ 設定</h2>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>禁煙開始日</label>
+      <input type="date" id="setup-startDate">
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>タバコ代（円/日）</label>
+      <input type="number" id="setup-dailyCost" placeholder="例: 600" min="0">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveSmokingSetup()">開始する</button>
+      <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('smokingSetupModal')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 喫煙記録 モーダル ===== -->
+<div class="modal-bg" id="smokingBoughtModal">
+  <div class="modal">
+    <h2>🚬 タバコを記録</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:12px">今日の購入金額を入力してください。節約額から差し引かれます。</p>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>購入金額（円）</label>
+      <input type="number" id="bought-amount" placeholder="0" min="0">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="checkInBought()">記録する</button>
+      <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('smokingBoughtModal')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== タバコ代変更 モーダル ===== -->
+<div class="modal-bg" id="costChangeModal">
+  <div class="modal">
+    <h2>💴 タバコ代を変更</h2>
+    <p style="font-size:13px;color:#666;margin-bottom:12px">変更日以降の節約計算に新しい金額が適用されます。</p>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>変更日</label>
+      <input type="date" id="costChange-date">
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>新しいタバコ代（円/日）</label>
+      <input type="number" id="costChange-amount" placeholder="例: 700" min="0">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveCostChange()">変更する</button>
+      <button class="btn btn-outline" style="color:#666;border-color:#ccc" onclick="closeModal('costChangeModal')">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 相談チャット モーダル ===== -->
+<div class="modal-bg" id="smokingChatModal">
+  <div class="modal chat-modal">
+    <div class="chat-modal-header">
+      <h2>💬 禁煙サポートチャット</h2>
+      <button style="background:none;border:none;font-size:20px;cursor:pointer;color:#888" onclick="closeModal('smokingChatModal')">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="気持ちを話してみてください..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+      <button class="chat-send-btn" onclick="sendChatMessage()">送信</button>
     </div>
   </div>
 </div>
@@ -643,7 +816,7 @@ function renderPeriodBar(){
   const {year,month} = currentPeriod;
   const start = getPeriodStart(year,month);
   const end = getPeriodEnd(year,month);
-  document.getElementById('periodLabel').textContent = `${year}�t${month}月度`;
+  document.getElementById('periodLabel').textContent = `${year}�t${month}月度`;
   document.getElementById('periodSub').textContent = `${start} 〜 ${end}`;
 }
 function shiftPeriod(d){
@@ -1099,6 +1272,327 @@ function renderAll(){
 }
 
 init();
+
+// ==================== 禁煙チャレンジ ====================
+const SMOKING_SK = 'smoking_v1';
+let smokingData = null;
+let smokingSectionVisible = false;
+
+const MILESTONES = [
+  {days:1,  icon:'🥉', label:'最初の一歩'},
+  {days:3,  icon:'🌱', label:'3日坊主を超えた'},
+  {days:7,  icon:'⭐', label:'1週間達成'},
+  {days:14, icon:'🌟', label:'2週間達成'},
+  {days:30, icon:'🏅', label:'1ヶ月達成'},
+  {days:90, icon:'🥈', label:'3ヶ月達成'},
+  {days:180,icon:'🥇', label:'半年達成'},
+  {days:365,icon:'🏆', label:'1年達成！'},
+];
+
+const CHAT_MESSAGES = [
+  '今{days}日間も禁煙を続けています！{savings}円も節約できました。この衝動は約5分で過ぎ去ります。深呼吸してみましょう🌬️',
+  'たばこを吸いたい気持ち、よくわかります。でも{days}日間の努力を思い出してください！{savings}円分の意志の力です💪',
+  '今ここで我慢すれば、また一歩前進できます。水を一杯飲んで気持ちを落ち着かせましょう😊',
+  '{days}日間、本当によく頑張っています！この衝動は必ず過ぎ去ります。お気に入りの場所を思い浮かべてみてください🌿',
+  '節約できた{savings}円で何か楽しいことをしましょう！その楽しみを想像して気を紛らわせて👍',
+  '禁煙の衝動は「波」のようなもの。今は頂点かもしれませんが、必ず引いていきます🌊',
+  '{days}日間の禁煙で、あなたの体は確実に回復しています。もう少しだけ頑張りましょう❤️',
+  '吸いたいと感じるのは脳がニコチンを求めているだけです。本当の「あなた」は禁煙したいと思っています✨',
+  'ガムを噛んだり、軽く散歩したり、手や口を別のことで忙しくさせてみましょう🚶',
+  '一息ついて、今まで{days}日間頑張ってきた自分を褒めてあげましょう！{savings}円の節約は本物です🎉',
+  'この瞬間を乗り越えたら、また「あの時頑張ったな」と思える記憶になります。一緒に乗り越えましょう🤝',
+  '大丈夫、あなたはできます。{days}日間という実績がそれを証明しています！',
+];
+
+function loadSmokingData(){
+  const s = localStorage.getItem(SMOKING_SK);
+  smokingData = s ? JSON.parse(s) : null;
+}
+
+function saveSmokingData(){
+  localStorage.setItem(SMOKING_SK, JSON.stringify(smokingData));
+}
+
+function todayStr(){
+  return ds(new Date());
+}
+
+function getCostForDate(date){
+  if(!smokingData || !smokingData.costHistory || smokingData.costHistory.length === 0) return 0;
+  const applicable = smokingData.costHistory.filter(h => h.date <= date)
+    .sort((a,b) => b.date.localeCompare(a.date));
+  return applicable[0] ? applicable[0].cost : 0;
+}
+
+function calcSmokingDays(){
+  if(!smokingData) return 0;
+  const start = new Date(smokingData.startDate + 'T00:00:00');
+  const today = new Date(todayStr() + 'T00:00:00');
+  return Math.max(0, Math.floor((today - start) / 86400000) + 1);
+}
+
+function calcSmokingSavings(){
+  if(!smokingData) return 0;
+  let savings = 0;
+  (smokingData.checkIns || []).forEach(ci => {
+    const cost = getCostForDate(ci.date);
+    if(ci.smokeFree) savings += cost;
+    else savings -= ci.amount;
+  });
+  return savings;
+}
+
+function getSmokingStreak(){
+  if(!smokingData) return 0;
+  const checkIns = (smokingData.checkIns || []).filter(c => c.smokeFree)
+    .map(c => c.date).sort((a,b) => b.localeCompare(a));
+  if(checkIns.length === 0) return 0;
+  let streak = 0;
+  let cursor = new Date(todayStr() + 'T00:00:00');
+  for(let i = 0; i < 365; i++){
+    const d = ds(cursor);
+    if(checkIns.includes(d)){
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      // allow today to be unchecked yet
+      if(i === 0){ cursor.setDate(cursor.getDate() - 1); continue; }
+      break;
+    }
+  }
+  return streak;
+}
+
+function getTodayCheckIn(){
+  if(!smokingData) return null;
+  return (smokingData.checkIns || []).find(c => c.date === todayStr()) || null;
+}
+
+function toggleSmokingSection(){
+  smokingSectionVisible = !smokingSectionVisible;
+  const sec = document.getElementById('smokingSection');
+  if(smokingSectionVisible){
+    sec.classList.remove('smoking-section-hidden');
+    // If no data, open setup
+    if(!smokingData){
+      openSmokingSetupModal();
+    } else {
+      renderSmokingSection();
+    }
+    sec.scrollIntoView({behavior:'smooth', block:'start'});
+  } else {
+    sec.classList.add('smoking-section-hidden');
+  }
+}
+
+function renderSmokingSection(){
+  if(!smokingData) return;
+  const days = calcSmokingDays();
+  const savings = calcSmokingSavings();
+  const streak = getSmokingStreak();
+
+  // Stats
+  document.getElementById('smokingDaysNum').textContent = days + '日';
+  const savEl = document.getElementById('smokingSavingsNum');
+  if(savings >= 0){
+    savEl.textContent = '¥' + savings.toLocaleString('ja-JP');
+    savEl.className = 'stat-num';
+  } else {
+    savEl.textContent = '−¥' + Math.abs(savings).toLocaleString('ja-JP');
+    savEl.className = 'stat-num stat-savings-neg';
+  }
+
+  // Streak
+  document.getElementById('smokingStreakLabel').textContent =
+    streak > 0 ? `🔥 連続禁煙 ${streak}日` : '';
+
+  // Milestones
+  const row = document.getElementById('milestonesRow');
+  row.innerHTML = '';
+  MILESTONES.forEach(m => {
+    const span = document.createElement('span');
+    span.className = 'milestone-badge' + (days >= m.days ? ' achieved' : '');
+    span.textContent = m.icon;
+    span.title = `${m.label}（${m.days}日）`;
+    row.appendChild(span);
+  });
+
+  // Progress bar - find next milestone
+  const nextMilestone = MILESTONES.find(m => m.days > days);
+  const prevMilestone = [...MILESTONES].reverse().find(m => m.days <= days);
+  if(nextMilestone){
+    const base = prevMilestone ? prevMilestone.days : 0;
+    const pct = Math.min(100, ((days - base) / (nextMilestone.days - base)) * 100);
+    document.getElementById('smokingProgressLabel').textContent =
+      `次の目標「${nextMilestone.label}」まであと${nextMilestone.days - days}日`;
+    document.getElementById('smokingProgressFill').style.width = pct + '%';
+    document.getElementById('smokingProgressWrap').style.display = '';
+  } else {
+    document.getElementById('smokingProgressWrap').style.display = 'none';
+  }
+
+  // Today status
+  const todayCI = getTodayCheckIn();
+  const statusEl = document.getElementById('smokingTodayStatus');
+  const actionsEl = document.getElementById('smokingActionBtns');
+  if(todayCI){
+    if(todayCI.smokeFree){
+      statusEl.innerHTML = '<div class="smoking-done-badge">✅ 今日は禁煙できました！</div>';
+    } else {
+      statusEl.innerHTML = `<div class="smoking-done-badge bought">🚬 今日はタバコを購入しました（¥${todayCI.amount.toLocaleString('ja-JP')}）</div>`;
+    }
+    actionsEl.style.display = 'none';
+  } else {
+    statusEl.innerHTML = '';
+    actionsEl.style.display = '';
+  }
+
+  // Cost history
+  const histEl = document.getElementById('costHistoryList');
+  histEl.innerHTML = '';
+  (smokingData.costHistory || []).slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(h => {
+    const row = document.createElement('div');
+    row.className = 'cost-history-row';
+    row.innerHTML = `<span>${h.date}</span><span>¥${h.cost.toLocaleString('ja-JP')}/日</span>`;
+    histEl.appendChild(row);
+  });
+}
+
+// ===== セットアップ =====
+function openSmokingSetupModal(){
+  const today = todayStr();
+  if(smokingData){
+    document.getElementById('setup-startDate').value = smokingData.startDate;
+    document.getElementById('setup-dailyCost').value = getCostForDate(today) || '';
+  } else {
+    document.getElementById('setup-startDate').value = today;
+    document.getElementById('setup-dailyCost').value = '';
+  }
+  document.getElementById('smokingSetupModal').classList.add('open');
+}
+
+function saveSmokingSetup(){
+  const startDate = document.getElementById('setup-startDate').value;
+  const dailyCost = parseInt(document.getElementById('setup-dailyCost').value, 10);
+  if(!startDate){ showToast('開始日を入力してください'); return; }
+  if(isNaN(dailyCost) || dailyCost < 0){ showToast('タバコ代を入力してください'); return; }
+  if(!smokingData){
+    smokingData = { startDate, costHistory: [{date: startDate, cost: dailyCost}], checkIns: [] };
+  } else {
+    smokingData.startDate = startDate;
+    // update initial cost if no history or update first entry
+    if(!smokingData.costHistory || smokingData.costHistory.length === 0){
+      smokingData.costHistory = [{date: startDate, cost: dailyCost}];
+    } else {
+      smokingData.costHistory[0].cost = dailyCost;
+    }
+  }
+  saveSmokingData();
+  closeModal('smokingSetupModal');
+  renderSmokingSection();
+  showToast('禁煙チャレンジを開始しました！💪');
+}
+
+// ===== チェックイン =====
+function checkInSmokeFree(){
+  if(!smokingData){ openSmokingSetupModal(); return; }
+  const today = todayStr();
+  if(getTodayCheckIn()){ showToast('今日はすでに記録済みです'); return; }
+  smokingData.checkIns.push({date: today, smokeFree: true, amount: 0});
+  saveSmokingData();
+  renderSmokingSection();
+  const savings = calcSmokingSavings();
+  showToast(`禁煙達成！今日も${getCostForDate(today).toLocaleString('ja-JP')}円節約！合計¥${savings.toLocaleString('ja-JP')}`);
+}
+
+function openBoughtModal(){
+  if(!smokingData){ openSmokingSetupModal(); return; }
+  const cost = getCostForDate(todayStr());
+  document.getElementById('bought-amount').value = cost || '';
+  document.getElementById('smokingBoughtModal').classList.add('open');
+}
+
+function checkInBought(){
+  const amount = parseInt(document.getElementById('bought-amount').value, 10);
+  if(isNaN(amount) || amount < 0){ showToast('金額を入力してください'); return; }
+  const today = todayStr();
+  // Remove existing today check-in if any
+  smokingData.checkIns = smokingData.checkIns.filter(c => c.date !== today);
+  smokingData.checkIns.push({date: today, smokeFree: false, amount});
+  saveSmokingData();
+  closeModal('smokingBoughtModal');
+  renderSmokingSection();
+  showToast('記録しました。また明日から頑張りましょう！');
+}
+
+// ===== タバコ代変更 =====
+function openCostChangeModal(){
+  document.getElementById('costChange-date').value = todayStr();
+  document.getElementById('costChange-amount').value = getCostForDate(todayStr()) || '';
+  document.getElementById('costChangeModal').classList.add('open');
+}
+
+function saveCostChange(){
+  const date = document.getElementById('costChange-date').value;
+  const cost = parseInt(document.getElementById('costChange-amount').value, 10);
+  if(!date){ showToast('変更日を入力してください'); return; }
+  if(isNaN(cost) || cost < 0){ showToast('金額を入力してください'); return; }
+  if(!smokingData){ showToast('先に禁煙チャレンジを設定してください'); return; }
+  // Remove existing entry for same date, then add new
+  smokingData.costHistory = smokingData.costHistory.filter(h => h.date !== date);
+  smokingData.costHistory.push({date, cost});
+  smokingData.costHistory.sort((a,b) => a.date.localeCompare(b.date));
+  saveSmokingData();
+  closeModal('costChangeModal');
+  renderSmokingSection();
+  showToast(`${date}から¥${cost.toLocaleString('ja-JP')}/日に変更しました`);
+}
+
+// ===== 相談チャット =====
+let chatHistory = [];
+
+function openChatModal(){
+  chatHistory = [];
+  const messages = document.getElementById('chatMessages');
+  messages.innerHTML = '';
+  const days = calcSmokingDays();
+  const savings = calcSmokingSavings();
+  const greeting = `こんにちは！禁煙サポートチャットです😊 ${smokingData ? `現在${days}日間禁煙中で¥${savings.toLocaleString('ja-JP')}節約できています！` : ''} どんな気持ちですか？話してみてください。`;
+  appendChatMsg('bot', greeting);
+  document.getElementById('smokingChatModal').classList.add('open');
+  setTimeout(() => document.getElementById('chatInput').focus(), 100);
+}
+
+function appendChatMsg(role, text){
+  const el = document.createElement('div');
+  el.className = 'chat-msg ' + role;
+  el.textContent = text;
+  const container = document.getElementById('chatMessages');
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendChatMessage(){
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  appendChatMsg('user', text);
+  input.value = '';
+  // Bot reply (preset, random pick with variable substitution)
+  setTimeout(() => {
+    const days = calcSmokingDays();
+    const savings = calcSmokingSavings();
+    const templates = CHAT_MESSAGES;
+    const tmpl = templates[Math.floor(Math.random() * templates.length)];
+    const reply = tmpl
+      .replace(/{days}/g, days + '日')
+      .replace(/{savings}/g, '¥' + Math.abs(savings).toLocaleString('ja-JP'));
+    appendChatMsg('bot', reply);
+  }, 400 + Math.random() * 300);
+}
+
+// Init smoking data on load
+loadSmokingData();
 </script>
 </body>
 </html>
